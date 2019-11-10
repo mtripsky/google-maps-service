@@ -1,0 +1,18 @@
+{
+  "name": "googlemapsservice",
+  "version": "1.0.0",
+  "description": "querry google maps to get information about routes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parser": "^2.3.1",
+    "csv-writer": "^1.5.0",
+    "dotenv": "^8.2.0",
+    "mongoose": "^5.7.7",
+    "request": "^2.88.0"
+  }
+}
