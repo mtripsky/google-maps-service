@@ -1,6 +1,7 @@
 const Event = require('./models/events');
 const mongoose = require('mongoose');
 const https = require('https')
+var moment = require('moment-timezone');
 
 // connect to mongodb
 const dotenv = require('dotenv').config();
@@ -20,9 +21,10 @@ const key = process.env.googleKey;
 
 function GetDurationBetweenOriginAndDestination()
 {
-    const time = new Date(Date.now());
-    const day = time.getUTCDay();
-    const hour = time.getHours();
+    const timeNow = moment().tz('Europe/Brussels');
+    const day = timeNow.day();
+    const hour = timeNow.hour();
+
     if(day > 0 && day < 6 && hour >= startHour && hour < endHour)
     {
         https.get("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + originAddress + "&destinations=" + destinationAddress + "&departure_time=now&traffic_model=best_guess&key=" + key,
@@ -39,16 +41,15 @@ function GetDurationBetweenOriginAndDestination()
 
             res.on('end', () => {
                 const result = JSON.parse(data).rows[0].elements[0];
-                const dateTimeNow = time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + "T" + hour + ":" + time.getMinutes();
                 const record = {
-                    dateTime: dateTimeNow,
+                    dateTime: timeNow.format('YYYY-MM-DDTHH:mm:ss'),
                     distance: Math.ceil(parseFloat(result.distance.value) / 1000),
                     duration: Math.ceil(parseFloat(result.duration.value) / 60),
                     duration_in_traffic: Math.ceil(parseFloat(result.duration_in_traffic.value) / 60)
                 };
                 console.log(record);
                 const dbRecord = {
-                    dateTime: time,
+                    dateTime: timeNow,
                     source: "DurationService",
                     content: JSON.stringify(record)
                 };
